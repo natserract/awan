@@ -1,11 +1,15 @@
 [package]
-name = "generate-presigned-url"
+name = "rust-cli"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+
+# server/backend
+actix = "0.12"
+actix-web = "3.3.3"
 
 # environments
 dotenv = "0.9.0"

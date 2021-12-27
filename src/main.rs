@@ -1,9 +1,8 @@
-use std::env;
-use dotenv::dotenv;
+#![feature(never_type)]
+
+mod lib;
+use lib::cli;
 
 fn main() {
-    dotenv().ok();
-
-    let database_url = env::var("APP_BUCKET").expect("env must be set!");
-    println!("Hello, world! {}", database_url);
+    cli::run()
 }
