@@ -1,22 +1,15 @@
-use dotenv::dotenv;
 use std::env;
-use std::io;
-use std::io::Write;
 
 use crate::lib::helper;
+use helper::𝐼𝑂::{read_args, read_file, read_lines};
 
 pub fn run() {
-    let args: Vec<String> = env::args().collect();
-    let readlines = helper::read_lines();
+    let args: Vec<String> = read_args();
+    println!("args {:?}", args);
 
+    let readfile_lines = read_file("data.json");
+    println!("Read: {:?}", readfile_lines);
+
+    let readlines = read_lines();
     println!("{:?}", readlines);
-
-    for item in args.iter().enumerate() {
-        let (i, v): (usize, &String) = item;
-        let start_offset = i > 0;
-
-        if start_offset {
-            println!("Index: {}, Collect {:?}", i, v);
-        }
-    }
 }
