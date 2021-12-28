@@ -55,17 +55,15 @@ pub mod 𝐼𝑂 {
 
     pub fn read_file(file_path: &str) -> Vec<String> {
         let path = path::Path::new(file_path);
-        let file = File::open(path).expect("Failed to open file");
+        let file = File::open(path).unwrap();
 
-        let mut buf = BufReader::new(file);
-        let mut vect = Vec::new();
+        let buf = 
+            BufReader::new(file)
+                .lines()
+                .map(|x| x.unwrap())
+                .collect::<Vec<String>>();
 
-        for (i, l) in buf.lines().enumerate() {
-            let line = l.unwrap();
-            vect.push(line);
-        }
-
-        vect
+        buf
     }
 
     pub fn read_args() -> Vec<String> {
