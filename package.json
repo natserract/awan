@@ -1,0 +1,13 @@
+{
+  "name": "aws-s3-rust",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/natserract/rust-project.git",
+  "author": "natserract <benjaminstwo@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "client:run": "cd client && yarn dev",
+    "client:build": "cd client && yarn build",
+    "server:run": "cargo run -p server"
+  }
+}

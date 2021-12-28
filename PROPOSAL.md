@@ -13,3 +13,8 @@ Stack:
 - graphql
 
 https://abhibvp003.medium.com/aws-s3-uploads-using-pre-signed-urls-bb5dd0a8a8e3
+
+
+
+<!-- NEW -->
+AWS S3 CLI
