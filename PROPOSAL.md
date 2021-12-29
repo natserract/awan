@@ -18,3 +18,6 @@ https://abhibvp003.medium.com/aws-s3-uploads-using-pre-signed-urls-bb5dd0a8a8e3
 
 <!-- NEW -->
 AWS S3 CLI
+
+
+https://saaslayerdev.s3.ap-southeast-1.amazonaws.com/xJd79JhyAzEckYLRj6vJMikszZBLRUyrVD95Kf5U.png?AWSAccessKeyId=AKIAY7FRUGLVE2EE57EN&Expires=1640309732&Signature=UezLEaM3HFss6pfANA%2FNrqLmQYA%3D
