@@ -2,9 +2,8 @@ use dotenv::dotenv;
 use s3::bucket::Bucket;
 use s3::creds::Credentials;
 use std::env;
+use super::types::Result as ResultT;
 
-pub type Error = Box<dyn std::error::Error>;
-pub type Result<T, E = Error> = std::result::Result<T, E>;
 #[derive(Debug)]
 pub struct S3Config {
   region: String,
@@ -46,7 +45,7 @@ pub fn s3_config() -> S3Config {
 }
 
 
-pub async fn list_s3_objects() -> Result<()> {
+pub async fn list_s3_objects() -> ResultT<()> {
   println!("Test");
 
   let config = s3_config();

@@ -1,8 +1,8 @@
 mod lib;
-use lib::{cli, s3::Result};
+use lib::{cli, types::Result as ResultT};
 
 #[tokio::main]
-async fn main() -> Result<()> {
+async fn main() -> ResultT<()> {
     cli::run().await?;
 
     Ok(())

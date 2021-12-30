@@ -1,8 +1,9 @@
-use super::s3::{list_s3_objects, Result};
+use super::s3::list_s3_objects;
 use super::system_io;
+use super::types::Result as ResultT;
 use system_io::{read_args, read_file, read_lines};
 
-pub async fn run() -> Result<()> {
+pub async fn run() -> ResultT<()> {
     // let args: Vec<String> = read_args();
     // println!("args {:?}", args);
 
