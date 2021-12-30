@@ -1,16 +1,27 @@
+/// See stored objects in an s3 bucket?
+///
+/// None of the APIs will give you a count because there really isn't any Amazon specific API to do that.
+/// You have to just run a list-contents and count the number of results that are returned.
+///
+/// But i got the solution i think
+/// type aws s3 ls, save in file, and readed -> parse to json
+/// 
+
+use super::types::Result as ResultT;
 use dotenv::dotenv;
+use s3::Region;
 use s3::bucket::Bucket;
 use s3::creds::Credentials;
+use s3::serde_types::ListBucketResult;
 use std::env;
-use super::types::Result as ResultT;
 
 #[derive(Debug)]
 pub struct S3Config {
-  region: String,
-  bucket: String,
+  pub region: String,
+  pub bucket: String,
   access_key_id: String,
   secret_access_key: String,
-  credentials: Credentials,
+  pub credentials: Credentials,
 }
 
 pub fn s3_config() -> S3Config {
@@ -44,27 +55,35 @@ pub fn s3_config() -> S3Config {
   aws_config
 }
 
-
-pub async fn list_s3_objects() -> ResultT<()> {
-  println!("Test");
-
+pub fn get_s3_bucket() -> ResultT<Bucket> {
   let config = s3_config();
   let bucket_name = config.bucket.as_str();
-  let credentials = config.credentials.clone();
-  let region = config.region.parse().unwrap();
+  let credentials: Credentials = config.credentials.clone();
+  let region: Region = config.region.parse().unwrap();
 
   let bucket = Bucket::new(bucket_name, region, credentials).unwrap();
 
-  let results = 
-    bucket.list(
-      "/".to_string(), 
-      Some("".to_string())
-    ).await?;
-  // let results = bucket.get_object("/").await?;
-  // let location = bucket.location().await?;
-  // let c = bucket.
-  
-  println!("Region {:?}", results);
+  Ok(bucket)
+}
 
-  Ok(())
+pub async fn list_s3_contents(bucket: Bucket, prefix: Option<String>) -> ResultT<Vec<ListBucketResult>> {
+  let prefix_o = match prefix {
+    Some (p) => p,
+    None => "/".to_string(),
+  };
+
+  let results = 
+    bucket.list(prefix_o, Some("".to_string())).await?;
+
+  Ok(results)
+}
+
+pub fn get_presigned_url(bucket: Bucket, key: &str) -> String {
+  let expire_secs: u32 = 3000;
+  let presigned_url = bucket.presign_get(key, expire_secs);
+
+  match presigned_url {
+    Ok(p) => p,
+    Err(error) => panic!("Error can't get presigned url {:?}", error),
+  }
 }
