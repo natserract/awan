@@ -1809,6 +1809,7 @@ dependencies = [
  "actix-web",
  "dotenv",
  "rust-s3",
+ "serde_json",
  "tokio 1.15.0",
 ]
 

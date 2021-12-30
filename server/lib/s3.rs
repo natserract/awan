@@ -1,19 +1,11 @@
-/// See stored objects in an s3 bucket?
-///
-/// None of the APIs will give you a count because there really isn't any Amazon specific API to do that.
-/// You have to just run a list-contents and count the number of results that are returned.
-///
-/// But i got the solution i think
-/// type aws s3 ls, save in file, and readed -> parse to json
-/// 
-
 use super::types::Result as ResultT;
 use dotenv::dotenv;
-use s3::Region;
 use s3::bucket::Bucket;
 use s3::creds::Credentials;
 use s3::serde_types::ListBucketResult;
+use s3::Region;
 use std::env;
+use std::process::{Command, Output};
 
 #[derive(Debug)]
 pub struct S3Config {
@@ -66,14 +58,16 @@ pub fn get_s3_bucket() -> ResultT<Bucket> {
   Ok(bucket)
 }
 
-pub async fn list_s3_contents(bucket: Bucket, prefix: Option<String>) -> ResultT<Vec<ListBucketResult>> {
+pub async fn list_s3_contents(
+  bucket: Bucket,
+  prefix: Option<String>,
+) -> ResultT<Vec<ListBucketResult>> {
   let prefix_o = match prefix {
-    Some (p) => p,
+    Some(p) => p,
     None => "/".to_string(),
   };
 
-  let results = 
-    bucket.list(prefix_o, Some("".to_string())).await?;
+  let results = bucket.list(prefix_o, Some("".to_string())).await?;
 
   Ok(results)
 }
@@ -86,4 +80,24 @@ pub fn get_presigned_url(bucket: Bucket, key: &str) -> String {
     Ok(p) => p,
     Err(error) => panic!("Error can't get presigned url {:?}", error),
   }
+}
+
+pub fn list_s3_objects() -> Output {
+  let config = s3_config();
+
+  // See stored objects in an s3 bucket?
+  //
+  // None of the APIs will give you a count because there really isn't any Amazon specific API to do that.
+  // You have to just run a list-contents and count the number of results that are returned.
+  //
+  // But i think, we can use aws cli
+  // From `aws s3 ls ...`, but this required to install aws cli
+  //
+  let layer = format!("s3://{}/", config.bucket);
+  let run_aws_cli = Command::new("aws")
+    .args(["s3", "ls", layer.as_str()])
+    .output()
+    .expect("Failed to execute aws s3");
+
+  run_aws_cli
 }
