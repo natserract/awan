@@ -3,6 +3,8 @@ use s3::bucket::Bucket;
 use s3::creds::Credentials;
 use std::env;
 
+pub type Error = Box<dyn std::error::Error>;
+pub type Result<T, E = Error> = std::result::Result<T, E>;
 #[derive(Debug)]
 pub struct S3Config {
   region: String,
@@ -15,7 +17,7 @@ pub struct S3Config {
 pub fn s3_config() -> S3Config {
   dotenv().ok();
 
-  // Get aws environment
+  // Get required aws environment
   let aws_region = env::var("AWS_REGION").expect("Environment AWS_REGION not found");
   let aws_bucket = env::var("AWS_BUCKET").expect("Environment AWS_BUCKET not found");
   let aws_access_key =
@@ -30,8 +32,7 @@ pub fn s3_config() -> S3Config {
     None,
     None,
     None,
-  )
-  .expect("Failed to read credentials");
+  ).expect("Failed to read credentials");
 
   let aws_config = S3Config {
     region: aws_region,
@@ -44,20 +45,27 @@ pub fn s3_config() -> S3Config {
   aws_config
 }
 
-// bucket: Bucket
-pub fn list_s3_objects() -> Result<(), ()> {
-  let config = &s3_config();
-  let bucket_name = &config.bucket.clone();
-  let credentials = &config.credentials.clone();
+
+pub async fn list_s3_objects() -> Result<()> {
+  println!("Test");
+
+  let config = s3_config();
+  let bucket_name = config.bucket.as_str();
+  let credentials = config.credentials.clone();
   let region = config.region.parse().unwrap();
 
-  let bucket = Bucket::new(
-    &bucket_name, 
-    region, 
-    credentials.to_owned(),
-  );
+  let bucket = Bucket::new(bucket_name, region, credentials).unwrap();
 
-  println!("Region {:?}, {:?}", bucket, config);
+  let results = 
+    bucket.list(
+      "/".to_string(), 
+      Some("".to_string())
+    ).await?;
+  // let results = bucket.get_object("/").await?;
+  // let location = bucket.location().await?;
+  // let c = bucket.
+  
+  println!("Region {:?}", results);
 
   Ok(())
 }
