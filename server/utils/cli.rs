@@ -10,7 +10,7 @@
 //
 use crate::types::Result as ResultT;
 use super::{
-    s3::{get_presigned_url, get_s3_bucket, list_s3_contents, list_s3_objects},
+    s3::{get_presigned_url, get_s3_bucket,list_s3_objects},
     system_io,
 };
 use system_io::{read_args, read_file, read_lines};
@@ -24,11 +24,10 @@ pub async fn run() -> ResultT<()> {
 
     // AWS S3
     let s3_bucket = &get_s3_bucket().unwrap();
-    let s3_contents = list_s3_contents(s3_bucket.to_owned(), None).await?;
+    let s3_list_objects = list_s3_objects(s3_bucket.to_owned(), None).await?;
     let presigned_url = get_presigned_url(s3_bucket.to_owned(), "zs8Nu5kV4XJ9EaTo3t6Sn788crgdioUYKC1HURzh.png");
-    let s3_list_objects = list_s3_objects();
 
-    println!("See list s3: {:?}", s3_contents);
+    println!("See list s3: {:?}", s3_list_objects);
     println!("See list s3: {:?}", presigned_url);
 
     let readlines = read_lines();

@@ -58,13 +58,13 @@ pub fn get_s3_bucket() -> ResultT<Bucket> {
   Ok(bucket)
 }
 
-pub async fn list_s3_contents(
+pub async fn list_s3_objects(
   bucket: Bucket,
   prefix: Option<String>,
 ) -> ResultT<Vec<ListBucketResult>> {
   let prefix_o = match prefix {
     Some(p) => p,
-    None => "/".to_string(),
+    None => "".to_string(),
   };
 
   let results = bucket.list(prefix_o, Some("".to_string())).await?;
@@ -82,17 +82,9 @@ pub fn get_presigned_url(bucket: Bucket, key: &str) -> String {
   }
 }
 
-pub fn list_s3_objects() -> Output {
+pub fn command_list_s3_objects() -> Output {
   let config = s3_config();
-
-  // See stored objects in an s3 bucket?
-  //
-  // None of the APIs will give you a count because there really isn't any Amazon specific API to do that.
-  // You have to just run a list-contents and count the number of results that are returned.
-  //
-  // But i think, we can use aws cli
-  // From `aws s3 ls ...`, to json. But this required for install aws cli
-  //
+  
   let layer = format!("s3://{}/", config.bucket);
   let run_aws_cli = Command::new("aws")
     .args(["s3", "ls", layer.as_str()])
