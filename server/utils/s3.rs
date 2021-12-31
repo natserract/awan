@@ -73,7 +73,7 @@ pub async fn list_s3_contents(
 }
 
 pub fn get_presigned_url(bucket: Bucket, key: &str) -> String {
-  let expire_secs: u32 = 3000;
+  let expire_secs: u32 = 100;
   let presigned_url = bucket.presign_get(key, expire_secs);
 
   match presigned_url {
