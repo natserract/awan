@@ -8,6 +8,7 @@
   "scripts": {
     "client:run": "cd client && yarn dev",
     "client:build": "cd client && yarn build",
-    "server:run": "cargo run"
+    "serve:run": "cargo run",
+    "serve:watch": "cargo watch -x 'run'"
   }
 }

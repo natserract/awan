@@ -8,7 +8,7 @@
 // If there is an &mut T reference to a value, there can be no other active references
 // at that time, but the value can be mutated.
 //
-use super::types::Result as ResultT;
+use crate::types::Result as ResultT;
 use super::{
     s3::{get_presigned_url, get_s3_bucket, list_s3_contents, list_s3_objects},
     system_io,

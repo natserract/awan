@@ -1,9 +1,13 @@
-mod lib;
-use lib::{cli, types::Result as ResultT};
+mod utils;
+mod pool;
+mod api;
+mod types;
+
+use types::Result as ResultT;
 
 #[tokio::main]
 async fn main() -> ResultT<()> {
-    cli::run().await?;
+    pool::actix();
 
     Ok(())
 }
