@@ -91,7 +91,7 @@ pub fn list_s3_objects() -> Output {
   // You have to just run a list-contents and count the number of results that are returned.
   //
   // But i think, we can use aws cli
-  // From `aws s3 ls ...`, but this required for install aws cli
+  // From `aws s3 ls ...`, to json. But this required for install aws cli
   //
   let layer = format!("s3://{}/", config.bucket);
   let run_aws_cli = Command::new("aws")

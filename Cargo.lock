@@ -1855,6 +1855,7 @@ dependencies = [
  "dotenv",
  "env_logger",
  "rust-s3",
+ "serde",
  "serde_json",
  "tokio 1.15.0",
 ]

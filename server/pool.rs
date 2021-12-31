@@ -1,4 +1,4 @@
-use actix_web::{App, main as actix_main, HttpServer, middleware, http::header};
+use actix_web::{App, main as actix_main, web, HttpServer, middleware, http::header};
 use actix_cors::Cors;
 use middleware::Logger as ActixLogger;
 use dotenv::dotenv;
@@ -53,8 +53,12 @@ pub async fn actix() -> IOResult<()> {
       App::new()
         .wrap(enable_cors())
         .wrap(ActixLogger::default())
+        .service(routes::s3_objects::index)
         .service(
-          routes::s3_objects::index
+          // # with query parameters
+          // /s3/presigned?filekey=...
+          web::resource("/s3/presigned")
+            .route(web::get().to(routes::s3_objects::get_presigned_url))
         )
     })
     .client_timeout(500)
