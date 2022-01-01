@@ -1,6 +1,7 @@
 
-#[macro_use] extern crate serde;
-#[macro_use] extern crate serde_json;
+#[macro_use] 
+pub extern crate serde;
+pub extern crate serde_json;
 
 mod utils;
 mod pool;

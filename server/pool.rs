@@ -1,7 +1,7 @@
 use super::api::routes;
 use super::utils::logger;
 use actix_cors::Cors;
-use actix_web::{http::header, main as actix_main, middleware, web, App, HttpServer, HttpResponse};
+use actix_web::{http::header, middleware, web, App, HttpServer, HttpResponse};
 use dotenv::dotenv;
 use middleware::Logger as ActixLogger;
 use std::env;
@@ -44,7 +44,6 @@ fn get_server_host() -> String {
   result
 }
 
-// #[actix_main]
 pub async fn actix() -> ResultT<IOResult<()>> {
   logger::init_logger(true);
 
@@ -55,6 +54,7 @@ pub async fn actix() -> ResultT<IOResult<()>> {
       .wrap(ActixLogger::default())
       .service(routes::s3::index)
       .service(
+        // # Scoped routes parent: /s3
         // # with query parameters
         // /s3/presigned?filekey=...
         web::scope("/s3/")

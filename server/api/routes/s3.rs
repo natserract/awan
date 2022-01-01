@@ -4,12 +4,10 @@ use crate::utils::s3::{
 use actix_web::{get, web, HttpRequest, HttpResponse, Responder};
 use chrono::{DateTime, Utc};
 
-use crate::types::{ErrorE, Result as ResultT};
-use s3::serde_types::{ListBucketResult, Object as ObjectT};
-use serde::ser::{SerializeStruct, Serializer};
+use s3::serde_types::{Object as S3Object};
 use serde::{Deserialize, Serialize};
 use serde_json::{self, json, to_string_pretty as json_pretty};
-use std::{ptr, rc::Rc};
+
 use web::Query as RequestQuery;
 use crate::runtime;
 
@@ -50,41 +48,52 @@ pub async fn get_presigned_url(
     .await
 }
 
-pub struct ListObjectsResponses {
-  objects: Vec<ObjectT>,
+#[derive(Debug, Serialize)]
+struct FieldObjects {
+  id: usize,
+  key: String,
+  last_modified: String,
+  size: u64,
 }
 
-impl Serialize for ListObjectsResponses {
-  fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-  where
-    S: serde::Serializer,
-  {
-    // let value = Rc::from(&self.objects);
-    // let values = vec![value];
-
-    // let j = json!(value);
-    // let to_json = serde_json::from_value::<Vec<Rc<ListBucketResult>>>(j).unwrap();
-
-    let mut state = serializer.serialize_struct("ListObjectsResponses", 1)?;
-    state.serialize_field("objects", &self)?;
-    state.end()
-
-    // for t in value {
-    //   sq.serialize_element(t.as_ref())?;
-    // }
-
-    // sq.end()
-  }
+#[derive(Serialize)]
+pub struct ListObjectsResponses {
+  objects: Vec<FieldObjects>
 }
 
 pub async fn get_list_objects() -> impl Responder {
   let s3_bucket = get_s3_bucket().unwrap();
-  let results = runtime().block_on(async {
-    list_s3_objects(s3_bucket, None).await
-  }).unwrap();
+  let responses = 
+    runtime()
+      .block_on(async {
+        list_s3_objects(s3_bucket, None).await
+      })
+    .unwrap();
+
+  let responses_it = 
+  responses.iter().cloned().map(|p| p.contents).into_iter();
+
+  let mut objects: Vec<FieldObjects> = Vec::new();
+
+  for item in responses_it.enumerate() {
+    let (_, lists): (usize, Vec<S3Object>) = item.clone();
+    
+    lists.iter().enumerate().for_each(|(i, o)| {
+      objects.push(FieldObjects {
+        id: i,
+        key: o.key.clone(),
+        last_modified: o.last_modified.clone(),
+        size: o.size.clone(),
+      })
+    });
+  }
 
   HttpResponse::Ok()
-    .body(json!(results))
+    .body(json!(
+      ListObjectsResponses {
+        objects,
+      }
+    ))
     .await
 }
 
