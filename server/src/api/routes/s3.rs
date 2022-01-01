@@ -71,7 +71,7 @@ pub async fn get_list_objects() -> impl Responder {
     .unwrap();
 
   let responses_it = 
-  responses.iter().cloned().map(|p| p.contents).into_iter();
+    responses.iter().cloned().map(|p| p.contents).into_iter();
 
   let mut objects: Vec<FieldObjects> = Vec::new();
 

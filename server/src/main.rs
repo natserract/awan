@@ -17,6 +17,13 @@ use pool::actix;
 
 use tokio::runtime::Runtime;
 
+// # Problems: `
+//  thread 'actix:..' panicked at 'there is no reactor running, must be called from the context 
+//  of a Tokio 1.x runtime'`
+//
+// So, we should handle this using `block_on()`
+// This used for execute the future, blocking the current thread until completion
+// 
 pub fn runtime() -> Runtime {
   Runtime::new().unwrap()
 }
