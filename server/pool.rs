@@ -1,18 +1,22 @@
-use actix_web::{App, main as actix_main, web, HttpServer, middleware, http::header};
+use super::api::routes;
+use super::utils::logger;
 use actix_cors::Cors;
-use middleware::Logger as ActixLogger;
+use actix_web::{http::header, main as actix_main, middleware, web, App, HttpServer, HttpResponse};
 use dotenv::dotenv;
+use middleware::Logger as ActixLogger;
 use std::env;
 use std::io::Result as IOResult;
-use crate::api::routes;
-use crate::utils::logger;
+use super::types::Result as ResultT;
 
 fn enable_cors() -> Cors {
-  let cors = 
-    Cors::default()
+  let cors = Cors::default()
     .allow_any_origin()
-    .allowed_methods(vec!["GET", "POST"])
-    .allowed_headers(vec!(header::AUTHORIZATION, header::ACCEPT, header::CONTENT_TYPE))
+    .allow_any_method()
+    .allowed_headers(vec![
+      header::AUTHORIZATION,
+      header::ACCEPT,
+      header::CONTENT_TYPE,
+    ])
     .supports_credentials()
     .max_age(3600);
 
@@ -24,49 +28,55 @@ fn get_server_host() -> String {
 
   let default_host = "localhost".to_string();
   let server_host = env::var("SERVER_HOST").ok();
-  
-  let result = 
-    match server_host {
-      Some (p) => {
-        let empty_str = "".to_string();
 
-        if p == empty_str { 
-          default_host 
-        } else {
-          p
-        }
-      },
-      None => default_host
-    };
+  let result = match server_host {
+    Some(p) => {
+      let empty_str = "".to_string();
 
+      if p == empty_str {
+        default_host
+      } else {
+        p
+      }
+    }
+    None => default_host,
+  };
   result
 }
 
-#[actix_main]
-pub async fn actix() -> IOResult<()> {
-    logger::init_logger(true);
+// #[actix_main]
+pub async fn actix() -> ResultT<IOResult<()>> {
+  logger::init_logger(true);
 
-    let server_host = get_server_host();
-    let listen_host = format!("{}:8000", server_host);
+  let listen_host = format!("{}:8000", get_server_host());
+  let server = HttpServer::new(move || {
+    App::new()
+      .wrap(enable_cors())
+      .wrap(ActixLogger::default())
+      .service(routes::s3::index)
+      .service(
+        // # with query parameters
+        // /s3/presigned?filekey=...
+        web::scope("/s3/")
+          .service(
+            web::resource("/presigned")
+              .route(web::get().to(routes::s3::get_presigned_url))
+          )
+          .service(
+            web::resource("/objects")
+              .route(web::get().to(routes::s3::get_list_objects))
+          )
+      )
+      .default_service(
+        web::route().to(|| HttpResponse::NotFound().json::<String>("Routes Not Found".into()))
+      )
+  })
+  .client_timeout(500)
+  .client_shutdown(500)
+  .shutdown_timeout(1)
+  .bind(listen_host)?
+  .run()
+  .await;
 
-    let server = HttpServer::new(move || {
-      App::new()
-        .wrap(enable_cors())
-        .wrap(ActixLogger::default())
-        .service(routes::s3_objects::index)
-        .service(
-          // # with query parameters
-          // /s3/presigned?filekey=...
-          web::resource("/s3/presigned")
-            .route(web::get().to(routes::s3_objects::get_presigned_url))
-        )
-    })
-    .client_timeout(500)
-    .client_shutdown(500)
-    .shutdown_timeout(1)
-    .bind(listen_host)?
-    .run()
-    .await;
-    
-    server
+  Ok(server)
 }

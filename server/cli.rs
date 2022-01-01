@@ -8,8 +8,8 @@
 // If there is an &mut T reference to a value, there can be no other active references
 // at that time, but the value can be mutated.
 //
-use crate::types::Result as ResultT;
-use super::{
+use super::types::Result as ResultT;
+use super::utils::{
     s3::{get_presigned_url, get_s3_bucket,list_s3_objects},
     system_io,
 };
@@ -24,7 +24,7 @@ pub async fn run() -> ResultT<()> {
 
     // AWS S3
     let s3_bucket = &get_s3_bucket().unwrap();
-    let s3_list_objects = list_s3_objects(s3_bucket.to_owned(), None).await?;
+    let s3_list_objects = list_s3_objects(s3_bucket.to_owned(), None).await;
     let presigned_url = get_presigned_url(s3_bucket.to_owned(), "zs8Nu5kV4XJ9EaTo3t6Sn788crgdioUYKC1HURzh.png");
 
     println!("See list s3: {:?}", s3_list_objects);

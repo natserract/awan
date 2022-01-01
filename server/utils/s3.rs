@@ -34,7 +34,8 @@ pub fn s3_config() -> S3Config {
     None,
     None,
     None,
-  ).expect("Failed to read credentials");
+  )
+  .expect("Failed to read credentials");
 
   let aws_config = S3Config {
     region: aws_region,
@@ -67,9 +68,7 @@ pub async fn list_s3_objects(
     None => "".to_string(),
   };
 
-  let results = bucket.list(prefix_o, Some("".to_string())).await?;
-
-  Ok(results)
+  bucket.list(prefix_o, Some("".to_string())).await
 }
 
 pub fn get_presigned_url(bucket: Bucket, key: &str) -> String {
@@ -84,7 +83,6 @@ pub fn get_presigned_url(bucket: Bucket, key: &str) -> String {
 
 pub fn command_list_s3_objects() -> Output {
   let config = s3_config();
-  
   let layer = format!("s3://{}/", config.bucket);
   let run_aws_cli = Command::new("aws")
     .args(["s3", "ls", layer.as_str()])

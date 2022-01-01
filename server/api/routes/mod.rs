@@ -1,1 +1,1 @@
-pub mod s3_objects;
+pub mod s3;

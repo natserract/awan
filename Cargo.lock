@@ -1853,6 +1853,7 @@ dependencies = [
  "actix",
  "actix-cors",
  "actix-web",
+ "anyhow",
  "chrono",
  "dotenv",
  "env_logger",
