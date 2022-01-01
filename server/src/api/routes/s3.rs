@@ -1,5 +1,8 @@
 use crate::utils::s3::{
-  get_presigned_url as presigned_url_func, get_s3_bucket, list_s3_objects,
+  get_presigned_url as presigned_url_func, 
+  get_s3_bucket, 
+  list_s3_objects,
+  delete_s3_object,
 };
 use actix_web::{get, web, HttpRequest, HttpResponse, Responder};
 use chrono::{DateTime, Utc};
@@ -17,7 +20,7 @@ pub async fn index() -> impl Responder {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct PresignedUrlQueryParams {
+pub struct GlQueryParams {
   filekey: String,
 }
 
@@ -28,8 +31,11 @@ pub struct PresignedUrlResponses {
   created_at: DateTime<Utc>,
 }
 
+// # Method: GET
+// -> Request: `/s3/presigned?filekey=<filekey>`
+// 
 pub async fn get_presigned_url(
-  query_params: RequestQuery<PresignedUrlQueryParams>,
+  query_params: RequestQuery<GlQueryParams>,
   request: HttpRequest,
 ) -> impl Responder {
   let filekey = &query_params.filekey;
@@ -61,6 +67,9 @@ pub struct ListObjectsResponses {
   objects: Vec<FieldObjects>
 }
 
+// # Method: GET
+// -> Request: `/s3/objects`
+// 
 pub async fn get_list_objects() -> impl Responder {
   let s3_bucket = get_s3_bucket().unwrap();
   let responses = 
@@ -89,6 +98,7 @@ pub async fn get_list_objects() -> impl Responder {
   }
 
   HttpResponse::Ok()
+    .content_type("application/json")
     .body(json!(
       ListObjectsResponses {
         objects,
@@ -97,9 +107,35 @@ pub async fn get_list_objects() -> impl Responder {
     .await
 }
 
-pub async fn get_list_objects2() -> impl Responder {
+#[derive(Serialize)]
+pub struct DeleteObjectResponses {
+  key: String,
+  message: String,
+}
+
+// # Method: DELETE
+// -> Request: `/s3/delete?filekey=<filekey>`
+// 
+pub async fn delete_object(
+  query_params: RequestQuery<GlQueryParams>,
+  request: HttpRequest
+) -> impl Responder {
+  let filekey = &query_params.filekey;
+
+  let s3_bucket = get_s3_bucket().unwrap();
+  let responses = 
+    runtime()
+      .block_on(async {
+        delete_s3_object(s3_bucket, filekey).await
+      });
+
   HttpResponse::Ok()
     .content_type("application/json")
-    .body(json_pretty("hello").unwrap())
+    .body(json!(
+      DeleteObjectResponses {
+        key: filekey.clone(),
+        message: responses,
+      }
+    ))
     .await
 }

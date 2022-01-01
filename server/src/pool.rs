@@ -47,7 +47,7 @@ fn get_server_host() -> String {
 pub async fn actix() -> ResultT<IOResult<()>> {
   logger::init_logger(true);
 
-  let listen_host = format!("{}:8000", get_server_host());
+  let listen_host = format!("{}:8080", get_server_host());
   let server = HttpServer::new(move || {
     App::new()
       .wrap(enable_cors())
@@ -65,6 +65,10 @@ pub async fn actix() -> ResultT<IOResult<()>> {
           .service(
             web::resource("/objects")
               .route(web::get().to(routes::s3::get_list_objects))
+          )
+          .service(
+            web::resource("/delete")
+              .route(web::delete().to(routes::s3::delete_object))
           )
       )
       .default_service(

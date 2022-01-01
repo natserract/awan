@@ -81,6 +81,15 @@ pub fn get_presigned_url(bucket: Bucket, key: &str) -> String {
   }
 }
 
+pub async fn delete_s3_object(bucket: Bucket, key: &str) -> String {
+  let delete_obj = bucket.delete_object(key).await;
+
+  match delete_obj {
+    Ok(_) => "Object succesfully delete".to_string(),
+    Err(error) => panic!("Error can't deleted object {:?}", error),
+  }
+}
+
 pub fn command_list_s3_objects() -> Output {
   let config = s3_config();
   let layer = format!("s3://{}/", config.bucket);
