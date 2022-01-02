@@ -36,7 +36,7 @@ pub struct PresignedUrlResponses {
 // 
 pub async fn get_presigned_url(
   query_params: RequestQuery<GlQueryParams>,
-  request: HttpRequest,
+  _request: HttpRequest,
 ) -> impl Responder {
   let filekey = &query_params.filekey;
 
@@ -118,7 +118,7 @@ pub struct DeleteObjectResponses {
 // 
 pub async fn delete_object(
   query_params: RequestQuery<GlQueryParams>,
-  request: HttpRequest
+  _request: HttpRequest
 ) -> impl Responder {
   let filekey = &query_params.filekey;
 

@@ -1,3 +1,4 @@
+#![cfg_attr(debug_assertions, allow(dead_code, unused_imports))]
 
 #[macro_use] 
 pub extern crate serde;
@@ -33,7 +34,9 @@ pub fn runtime() -> Runtime {
 #[actix_main]
 async fn main() -> ResultT<()> {
     // cli::run().await?;
-    actix().await?;
+    actix() 
+      .await?
+      .unwrap_or_else(|err| println!("Actix error: {:?} ", err));
 
     Ok(())
 }
