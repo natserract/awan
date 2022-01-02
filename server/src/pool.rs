@@ -64,6 +64,10 @@ pub async fn actix() -> ResultT<IOResult<()>> {
             web::resource("/delete")
               .route(web::delete().to(routes::s3::delete_object))
           )
+          .service(
+            web::resource("/bucket")
+              .route(web::get().to(routes::s3::get_bucket_name))
+          )
       )
       .default_service(
         web::route().to(|| HttpResponse::NotFound().json::<String>("Routes Not Found".into()))

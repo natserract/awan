@@ -139,3 +139,26 @@ pub async fn delete_object(
     ))
     .await
 }
+
+#[derive(Serialize)]
+pub struct GetBucketNameResponses {
+  bucket: String,
+  region: String,
+}
+
+// # Method: GET
+// -> Request: `/s3/bucket`
+// 
+pub async fn get_bucket_name() -> impl Responder {
+  let s3_bucket = get_s3_bucket().unwrap();
+
+  HttpResponse::Ok()
+    .content_type("application/json")
+    .body(json!(
+      GetBucketNameResponses {
+        bucket: s3_bucket.name,
+        region: s3_bucket.region.to_string(),
+      }
+    ))
+    .await
+}
