@@ -1,12 +1,13 @@
 use super::api::routes;
 use super::utils::logger;
+use super::types::Result as ResultT;
 use actix_cors::Cors;
 use actix_web::{http::header, middleware, web, App, HttpServer, HttpResponse};
 use dotenv::dotenv;
 use middleware::Logger as ActixLogger;
 use std::env;
 use std::io::Result as IOResult;
-use super::types::Result as ResultT;
+use crate::utils::generic::{OptChoice, Of};
 
 fn enable_cors() -> Cors {
   let cors = Cors::default()
@@ -23,31 +24,24 @@ fn enable_cors() -> Cors {
   cors
 }
 
-fn get_server_host() -> String {
+fn get_server_environment(var_name: &str, default_value: String) -> String {
   dotenv().ok();
 
-  let default_host = "localhost".to_string();
-  let server_host = env::var("SERVER_HOST").ok();
-
-  let result = match server_host {
-    Some(p) => {
-      let empty_str = "".to_string();
-
-      if p == empty_str {
-        default_host
-      } else {
-        p
-      }
-    }
-    None => default_host,
+  let env = env::var(var_name).ok();
+  let init_env_val = OptChoice {
+    default_value,
   };
-  result
+
+  init_env_val.value(env)
 }
 
 pub async fn actix() -> ResultT<IOResult<()>> {
   logger::init_logger(true);
 
-  let listen_host = format!("{}:8080", get_server_host());
+  let server_host = get_server_environment("SERVER_HOST", "localhost".to_string());
+  let server_port = get_server_environment("SERVER_PORT", "8080".to_string());
+
+  let listen_host = format!("{}:{}", server_host, server_port);
   let server = HttpServer::new(move || {
     App::new()
       .wrap(enable_cors())
