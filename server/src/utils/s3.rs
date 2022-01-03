@@ -63,10 +63,16 @@ pub async fn list_s3_objects(
   bucket: Bucket,
   prefix: Option<String>,
 ) -> ResultT<Vec<ListBucketResult>> {
-  let prefix_o = match prefix {
-    Some(p) => p,
-    None => "".to_string(),
-  };
+  let prefix_o = 
+    if let Some(p) = prefix { p } else {
+      "".to_string()
+    };
+
+  // @see: https://rust-lang.github.io/rust-clippy/master/#single_match_else
+  // let prefix_o = match prefix {
+  //   Some(p) => p,
+  //   None => "".to_string(),
+  // };
 
   bucket.list(prefix_o, Some("".to_string())).await
 }
