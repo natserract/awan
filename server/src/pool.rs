@@ -24,7 +24,7 @@ fn enable_cors() -> Cors {
   cors
 }
 
-fn get_server_environment(var_name: &str, default_value: String) -> String {
+fn get_server_env(var_name: &str, default_value: String) -> String {
   dotenv().ok();
 
   let env = env::var(var_name).ok();
@@ -38,8 +38,8 @@ fn get_server_environment(var_name: &str, default_value: String) -> String {
 pub async fn actix() -> ResultT<IOResult<()>> {
   logger::init_logger(true);
 
-  let server_host = get_server_environment("SERVER_HOST", "localhost".to_string());
-  let server_port = get_server_environment("SERVER_PORT", "8080".to_string());
+  let server_host = get_server_env("SERVER_HOST", "localhost".to_string());
+  let server_port = get_server_env("SERVER_PORT", "8080".to_string());
 
   let listen_host = format!("{}:{}", server_host, server_port);
   let server = HttpServer::new(move || {
