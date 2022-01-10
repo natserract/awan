@@ -1,6 +1,10 @@
 # Awan
 Awan is a simple web apps for manage Amazon S3 objects. That provide services can be used to store and retrieve data, at any time, from anywhere on the web.
 
+## Requirements
+- [Rust](https://www.rust-lang.org/tools/install)
+- [Node](https://nodejs.org)
+
 ## Ready APIs
 | API | Description | Docs/Reference
 | --- | ----------- | :-------------: |
@@ -10,6 +14,23 @@ Awan is a simple web apps for manage Amazon S3 objects. That provide services ca
 | `/s3/bucket` | Get a name and region of a bucket | [Docs](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#getBucketWebsite-property)
 
 ## Currently working on 
-[ ] Render list objects in table. 
+### Task UIs:
+  - [ ] Render list objects in table (optimized with react window) 🔥
+  - [ ] Form for generate presigned url
+  - [ ] Implement download, and upload file
+  - [ ] Add several actions (download/delete) for items
 
 ## Commands
+Run/watch a server
+```sh
+# Running default
+cargo run
+
+# Running and watch any changes
+cargo watch -x 'run'
+```
+
+Run client
+```sh
+yarn client:run
+```
