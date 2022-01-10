@@ -3,7 +3,7 @@ use std::env;
 
 const RUST_LOG: &str = "RUST_LOG";
 
-// Reference: https://github.com/Tapalogi/game-room/blob/main/src/utils.rs
+// Reference @see: https://github.com/Tapalogi/game-room/blob/main/src/utils.rs
 pub fn init_logger(debug_mode: bool) {
   if env::var(RUST_LOG).is_err() {
       #[cfg(debug_assertions)]

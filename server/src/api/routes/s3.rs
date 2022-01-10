@@ -20,7 +20,7 @@ pub async fn index() -> impl Responder {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct GlQueryParams {
+pub struct QueryParams {
   filekey: String,
 }
 
@@ -35,7 +35,7 @@ pub struct PresignedUrlResponses {
 // -> Request: `/s3/presigned?filekey=<filekey>`
 // 
 pub async fn get_presigned_url(
-  query_params: RequestQuery<GlQueryParams>,
+  query_params: RequestQuery<QueryParams>,
   _request: HttpRequest,
 ) -> impl Responder {
   let filekey = &query_params.filekey;
@@ -79,12 +79,11 @@ pub async fn get_list_objects() -> impl Responder {
       })
     .unwrap();
 
-  let responses_it = 
+  let iters = 
     responses.iter().cloned().map(|p| p.contents).into_iter();
-
   let mut objects: Vec<FieldObjects> = Vec::new();
 
-  for item in responses_it.enumerate() {
+  for item in iters.enumerate() {
     let (_, lists): (usize, Vec<S3Object>) = item.clone();
     
     lists.iter().enumerate().for_each(|(i, o)| {
@@ -117,7 +116,7 @@ pub struct DeleteObjectResponses {
 // -> Request: `/s3/delete?filekey=<filekey>`
 // 
 pub async fn delete_object(
-  query_params: RequestQuery<GlQueryParams>,
+  query_params: RequestQuery<QueryParams>,
   _request: HttpRequest
 ) -> impl Responder {
   let filekey = &query_params.filekey;
