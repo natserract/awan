@@ -19,6 +19,7 @@ Awan is a simple web apps for manage Amazon S3 objects. That provide services ca
   - [ ] Form for generate presigned url
   - [ ] Implement download, and upload file
   - [ ] Add several actions (download/delete) for items
+  - [ ] UI optimizations
 
 ## Commands
 Run/watch a server
